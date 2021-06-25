@@ -77,8 +77,9 @@ void Search::_symbolSearch(CompilationDatabase& compilationDatabase,
   clang::tooling::ClangTool SymbolSearch(compilationDatabase,
                                          {_location.filename});
 
-  const auto error = SymbolSearch.run(
-      new ClangExpand::SymbolSearch::ToolFactory(_location, query));
+  auto* tf = new ClangExpand::SymbolSearch::ToolFactory(_location, query);
+  const auto error = SymbolSearch.run(tf);
+  delete tf;
   if (error) std::exit(error);
 }
 
@@ -87,9 +88,9 @@ void Search::_definitionSearch(CompilationDatabase& compilationDatabase,
                                Query& query) {
   clang::tooling::ClangTool DefinitionSearch(compilationDatabase, sources);
 
-  const auto error = DefinitionSearch.run(
-      new ClangExpand::DefinitionSearch::ToolFactory(_location.filename,
-                                                     query));
+  auto* tf = new ClangExpand::DefinitionSearch::ToolFactory(_location.filename, query);
+  const auto error = DefinitionSearch.run(tf);
+  delete tf;
   if (error) std::exit(error);
 }
 
