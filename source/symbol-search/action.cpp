@@ -108,12 +108,14 @@ bool verifyToken(const clang::Token& token) {
 clang::FileID getFileID(const Location& targetLocation,
                         clang::SourceManager& sourceManager) {
   auto& fileManager = sourceManager.getFileManager();
-  const auto* fileEntry = fileManager.getFile(targetLocation.filename);
-  if (fileEntry == nullptr || !fileEntry->isValid()) {
+  const auto fileEntryE = fileManager.getFile(targetLocation.filename);
+  if (!fileEntryE) {
     Routines::error("Could not find file " +
                     llvm::Twine(targetLocation.filename) +
-                    " in file manager\n");
+                    " in file manager: " +
+					fileEntryE.getError().message());
   }
+  const auto* fileEntry = fileEntryE.get();
 
   assert(fileEntry->getName() == targetLocation.filename &&
          "Symbol search should only run on the target TU");
@@ -180,9 +182,8 @@ Action::Action(Location targetLocation, Query& query)
 : _query(query), _targetLocation(std::move(targetLocation)) {
 }
 
-bool Action::BeginSourceFileAction(clang::CompilerInstance& compiler,
-                                   llvm::StringRef filename) {
-  if (!super::BeginSourceFileAction(compiler, filename)) return false;
+bool Action::BeginSourceFileAction(clang::CompilerInstance& compiler) {
+  if (!super::BeginSourceFileAction(compiler)) return false;
 
   auto& sourceManager = compiler.getSourceManager();
   const clang::SourceLocation location =
