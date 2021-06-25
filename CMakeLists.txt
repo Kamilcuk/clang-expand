@@ -34,26 +34,10 @@ set(CMAKE_MODULE_PATH
    ${CMAKE_MODULE_PATH}
    "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules/")
 
+# https://bugs.archlinux.org/task/66283
 set(CLANG_LIBS
-  clangAST
-  clangASTMatchers
-  clangAnalysis
-  clangBasic
-  clangDriver
-  clangEdit
-  clangFrontend
-  clangFrontendTool
-  clangLex
-  clangParse
-  clangSema
-  clangEdit
-  clangRewrite
-  clangRewriteFrontend
-  clangSerialization
-  clangTooling
-  clangToolingCore
+	clang-cpp
 )
-
 if (NOT CMAKE_HOST_APPLE)
   set(CLANG_LIBS -Wl,--start-group ${CLANG_LIBS} -Wl,--end-group)
 endif()
